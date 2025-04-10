@@ -9,8 +9,11 @@ import {
   SignInSchema,
 } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
+import cors from "cors";
 
 const app = express();
+app.use(express.json());
+app.use(cors());
 interface AuthenticatedRequest extends Request {
   userId?: string;
 }
