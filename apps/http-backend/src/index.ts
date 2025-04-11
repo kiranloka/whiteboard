@@ -1,8 +1,7 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "@repo/backend-common/config";
 import bcrypt from "bcrypt";
-import { middleware } from "./middleware";
+import { middleware } from "./middleware.js";
 import {
   CreateUserSchema,
   CreateRoomSchema,
@@ -10,6 +9,7 @@ import {
 } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
 import cors from "cors";
+const { JWT_SECRET } = require("@repo/backend-common/config");
 
 const app = express();
 app.use(express.json());
@@ -32,6 +32,7 @@ app.post(
     const userId = req.userId;
     try {
       const room = await prismaClient.room.create({
+        //@ts-ignore
         data: {
           slug: parsedData.data.name,
           adminId: userId,
@@ -68,7 +69,8 @@ app.post("/signup", async (req, res) => {
       },
     });
     res.json({
-      userId: user.userId,
+      message: "User Created Successfully",
+      userId: user.id,
     });
   } catch (e) {
     res.status(411).json({
@@ -87,7 +89,7 @@ app.get("/chats/:roomId", async (req, res) => {
       orderBy: {
         id: "desc",
       },
-      take: 50,
+      take: 1000,
     });
 
     res.json({
@@ -112,12 +114,21 @@ app.post("/signin", async (req, res) => {
   const user = await prismaClient.user.findFirst({
     where: {
       email: data.data.userName,
-      password: data.data.password,
     },
   });
   if (!user) {
     res.json({
       message: "Not authorized!",
+    });
+    return;
+  }
+  const isPasswordCorrect = await bcrypt.compare(
+    data.data.password,
+    user.password
+  );
+  if (!isPasswordCorrect) {
+    res.sendStatus(401).json({
+      message: "Incorrect password",
     });
     return;
   }

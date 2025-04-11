@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Paper,
-  Stack,
-} from "@mui/material";
+import { Button, TextField, Typography, Paper, Stack } from "@mui/material";
 
 export function AuthPage({ isSignin }: { isSignin: boolean }) {
   return (

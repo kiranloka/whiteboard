@@ -1,10 +1,10 @@
 import { WebSocket, WebSocketServer } from "ws";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { JWT_SECRET } from "@repo/backend-common/config";
 import { prismaClient } from "@repo/db/client";
+const { JWT_SECRET } = require("@repo/backend-common/config");
 
 const wss = new WebSocketServer({ port: 8080 });
-
+console.log("Websocket server is runnning on ws://localhost:8080");
 interface User {
   ws: WebSocket;
   rooms: String[];
