@@ -1,9 +1,8 @@
-import { initDraw } from "@/draw";
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./IconButton";
 import { Game } from "@/draw/Game";
 import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
-
+import { initDraw } from "@/draw";
 export type Tool = "circle" | "rect" | "pencil";
 
 export function Canvas({

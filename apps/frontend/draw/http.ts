@@ -1,14 +1,38 @@
 import { HTTP_BACKEND } from "@/config";
 import axios from "axios";
+import { Shape } from "./Game";
 
-export async function getExistingShapes(roomId: string) {
-  const res = await axios.get(`${HTTP_BACKEND}/chats/${roomId}`);
-  const messages = res.data.messages;
+interface Message {
+  message: string;
+}
 
-  const shapes = messages.map((x: { message: string }) => {
-    const messageData = JSON.parse(x.message);
-    return messageData.shape;
-  });
+export async function getExistingShapes(roomId: string): Promise<Shape[]> {
+  try {
+    const res = await axios.get(`${HTTP_BACKEND}/chats/${roomId}`);
+    const messages = res.data.messages;
 
-  return shapes;
+    if (!Array.isArray(messages)) {
+      console.warn(`No valid messages found for room ${roomId}`);
+      return [];
+    }
+
+    const shapes: Shape[] = messages
+      .filter((x: Message) => {
+        try {
+          JSON.parse(x.message);
+          return true;
+        } catch {
+          return false;
+        }
+      })
+      .map((x: Message) => {
+        const messageData = JSON.parse(x.message);
+        return messageData.shape;
+      });
+
+    return shapes;
+  } catch (error) {
+    console.error(`Error fetching shapes for room ${roomId}:`, error);
+    return [];
+  }
 }
