@@ -1,6 +1,5 @@
-import { Tool } from "@/components/Canvas";
 import { getExistingShapes } from "./http";
-
+import { Tool } from "@/lib/types";
 export type Shape =
   | {
       type: "rect";
@@ -31,7 +30,7 @@ export class Game {
   private clicked: boolean;
   private startX = 0;
   private startY = 0;
-  private selectedTool: Tool = "circle";
+  private selectedTool: Tool;
 
   socket: WebSocket;
 
@@ -40,6 +39,7 @@ export class Game {
     this.ctx = canvas.getContext("2d")!;
     this.existingShapes = [];
     this.roomId = roomId;
+    this.selectedTool = "rectangle";
     this.socket = socket;
     this.clicked = false;
     this.init();
@@ -55,7 +55,7 @@ export class Game {
     this.canvas.removeEventListener("mousemove", this.mouseMoveHandler);
   }
 
-  setTool(tool: "circle" | "pencil" | "rect") {
+  setSelectedTool(tool: "circle" | "pencil" | "rectangle") {
     this.selectedTool = tool;
   }
 
@@ -94,7 +94,7 @@ export class Game {
           shape.centerY,
           Math.abs(shape.radius),
           0,
-          Math.PI * 2
+          Math.PI * 2,
         );
         this.ctx.stroke();
         this.ctx.closePath();
@@ -114,7 +114,7 @@ export class Game {
 
     const selectedTool = this.selectedTool;
     let shape: Shape | null = null;
-    if (selectedTool === "rect") {
+    if (selectedTool === "rectangle") {
       shape = {
         type: "rect",
         x: this.startX,
@@ -145,7 +145,7 @@ export class Game {
           shape,
         }),
         roomId: this.roomId,
-      })
+      }),
     );
   };
   mouseMoveHandler = (e: MouseEvent) => {
@@ -156,7 +156,7 @@ export class Game {
       this.ctx.strokeStyle = "rgba(255, 255, 255)";
       const selectedTool = this.selectedTool;
       console.log(selectedTool);
-      if (selectedTool === "rect") {
+      if (selectedTool === "rectangle") {
         this.ctx.strokeRect(this.startX, this.startY, width, height);
       } else if (selectedTool === "circle") {
         const radius = Math.max(width, height) / 2;

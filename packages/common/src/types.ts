@@ -1,17 +1,22 @@
-//@ts-ignore
-import { z } from "zod";
+const { z } = require("zod");
 
-export const CreateUserSchema = z.object({
-  userName: z.string().min(3).max(25),
-  password: z.string(),
+const CreateUserSchema = z.object({
+  email: z.string().email().min(3).max(20).trim(),
+  password: z.string().min(4, "Must be at least 4 characters long"),
   name: z.string().min(3).max(20),
 });
 
-export const SignInSchema = z.object({
-  userName: z.string().min(3).max(25),
-  password: z.string(),
+const SigninSchema = z.object({
+  email: z.string().email().min(3).max(20).trim(),
+  password: z.string().min(4, "Must be at least 4 characters long"),
 });
 
-export const CreateRoomSchema = z.object({
+const CreateRoomSchema = z.object({
   name: z.string().min(3).max(20),
 });
+
+module.exports = {
+  CreateUserSchema,
+  SigninSchema,
+  CreateRoomSchema,
+};
