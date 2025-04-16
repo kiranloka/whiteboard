@@ -1,10 +1,11 @@
 import { WebSocket, WebSocketServer } from "ws";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { prismaClient } from "@repo/db/client";
-const { JWT_SECRET } = require("@repo/backend-common/config");
-const wss = new WebSocketServer({ port: 8080 });
-console.log("websocket connected on port 8080");
+const { JWT_SECRET } = require("@repo/config/config").JWT_SECRET;
+const PORT = require("@repo/config/config").PORT;
+const wss = new WebSocketServer({ port: PORT | 8080 });
+console.log(`Websocket server started at port ${PORT}`);
 
+const { prisma } = require("@repo/db/prisma");
 interface User {
   ws: WebSocket;
   rooms: string[];
@@ -80,7 +81,7 @@ wss.on("connection", function connection(ws, request) {
       const roomId = parsedData.roomId;
       const message = parsedData.message;
 
-      await prismaClient.chat.create({
+      await prisma.chat.create({
         data: {
           roomId: Number(roomId),
           message,
@@ -95,7 +96,7 @@ wss.on("connection", function connection(ws, request) {
               type: "chat",
               message: message,
               roomId,
-            })
+            }),
           );
         }
       });
