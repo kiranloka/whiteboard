@@ -8,7 +8,7 @@ interface Message {
 
 export async function getExistingShapes(roomId: string): Promise<Shape[]> {
   try {
-    const res = await axios.get(`${HTTP_BACKEND}/chats/${roomId}`);
+    const res = await axios.get(`${HTTP_BACKEND}/api/v1/chats/${roomId}`);
     const messages = res.data.messages;
 
     if (!Array.isArray(messages)) {

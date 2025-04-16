@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import "tailwindcss";
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -48,3 +48,4 @@
     --ring: 224.3 76.3% 48%;
   }
 }
+

@@ -15,6 +15,8 @@ model User {
   photo    String?
   rooms    Room[]
   chats    Chat[]
+
+  @@map("users")
 }
 
 model Chat {
@@ -24,6 +26,7 @@ model Chat {
   roomId  Int
   room    Room   @relation(fields: [roomId], references: [id])
   user    User   @relation(fields: [userId], references: [id])
+  @@map("chats")
 }
 
 model Room {
@@ -33,4 +36,5 @@ model Room {
   adminId   String
   chats     Chat[]
   admin     User     @relation(fields: [adminId], references: [id])
+  @@map("rooms")
 }

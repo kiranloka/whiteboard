@@ -30,7 +30,7 @@ export class Game {
   private clicked: boolean;
   private startX = 0;
   private startY = 0;
-  private selectedTool: Tool;
+  private selectedTool: Tool = "circle";
 
   socket: WebSocket;
 

@@ -3,7 +3,7 @@ import { IconButton } from "./IconButton";
 import { Game } from "@/draw/Game";
 import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
 import { initDraw } from "@/draw";
-export type Tool = "circle" | "rect" | "pencil";
+export type Tool = "circle" | "rectangle" | "pencil";
 
 export function Canvas({
   roomId,
@@ -17,7 +17,7 @@ export function Canvas({
   const [selectedTool, setSelectedTool] = useState<Tool>("circle");
 
   useEffect(() => {
-    game?.setTool(selectedTool);
+    game?.setSelectedTool(selectedTool);
   }, [selectedTool, game]);
 
   useEffect(() => {
@@ -73,9 +73,9 @@ function Topbar({
         />
         <IconButton
           onClick={() => {
-            setSelectedTool("rect");
+            setSelectedTool("rectangle");
           }}
-          activated={selectedTool === "rect"}
+          activated={selectedTool === "rectangle"}
           icon={<RectangleHorizontalIcon />}
         ></IconButton>
         <IconButton

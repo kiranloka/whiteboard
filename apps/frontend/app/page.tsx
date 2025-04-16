@@ -1,3 +1,14 @@
+import { HeroSectionOne } from "@/components/HeroSectionOne";
+import Navbar from "@/components/Navbar";
+
 export default function Home() {
-  return <div>hello this is loka kiran kumar</div>;
+  return (
+    <div>
+      <Navbar></Navbar>
+      <div>
+        {" "}
+        <HeroSectionOne></HeroSectionOne>
+      </div>
+    </div>
+  );
 }
