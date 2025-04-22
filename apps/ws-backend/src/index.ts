@@ -5,10 +5,10 @@ const PORT = require("@repo/config/config").PORT;
 const wss = new WebSocketServer({ port: PORT | 8080 });
 console.log(`Websocket server started at port ${PORT}`);
 
-const { prisma } = require("@repo/db/prisma");
+import { prisma } from "@repo/db";
 interface User {
   ws: WebSocket;
-  rooms: string[];
+  rooms: number[];
   userId: string;
 }
 
@@ -64,6 +64,10 @@ wss.on("connection", function connection(ws, request) {
     if (parsedData.type === "join_room") {
       const user = users.find((x) => x.ws === ws);
       user?.rooms.push(parsedData.roomId);
+      console.log("user pushed connection established!");
+      const rooms = users.flatMap((user) => {
+        return user.rooms;
+      });
     }
 
     if (parsedData.type === "leave_room") {
@@ -78,12 +82,12 @@ wss.on("connection", function connection(ws, request) {
     console.log(parsedData);
 
     if (parsedData.type === "chat") {
-      const roomId = parsedData.roomId;
+      const roomId = Number(parsedData.roomId);
       const message = parsedData.message;
 
       await prisma.chat.create({
         data: {
-          roomId: Number(roomId),
+          roomId,
           message,
           userId,
         },
@@ -96,7 +100,58 @@ wss.on("connection", function connection(ws, request) {
               type: "chat",
               message: message,
               roomId,
-            }),
+            })
+          );
+        }
+      });
+    }
+
+    if (parsedData.type == "move_shape") {
+      const roomId = Number(parsedData.roomId);
+      const { shape, shapeIndex } = parsedData;
+
+      users.forEach((user) => {
+        if (user.rooms.includes(roomId)) {
+          user.ws.send(
+            JSON.stringify({
+              type: "move_shape",
+              roomId,
+              shape,
+              shapeIndex,
+            })
+          );
+        }
+      });
+    }
+
+    if (parsedData.type == "delete_shape") {
+      const { deleteIndex, roomId } = parsedData;
+
+      users.forEach((user) => {
+        if (user.rooms.includes(Number(roomId))) {
+          user.ws.send(
+            JSON.stringify({
+              type: "delete_shape",
+              deleteIndex,
+              roomId,
+            })
+          );
+        }
+      });
+    }
+
+    if (parsedData.type == "delete_shape_by_id") {
+      const roomId = Number(parsedData.roomId);
+      const { shapeId } = parsedData;
+
+      users.forEach((user) => {
+        if (user.rooms.includes(roomId)) {
+          user.ws.send(
+            JSON.stringify({
+              type: "delete_shape_by_id",
+              roomId,
+              shapeId,
+            })
           );
         }
       });

@@ -1,9 +1,56 @@
 "use client";
 
-import React from "react";
-import { Button, TextField, Typography, Paper, Stack } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Stack,
+  Alert,
+} from "@mui/material";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export function AuthPage({ isSignin }: { isSignin: boolean }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const router = useRouter();
+
+  const handleAuth = async () => {
+    try {
+      setError("");
+      setSuccess("");
+
+      const Endpoint = isSignin
+        ? "http://localhost:3001/api/v1/user/signin"
+        : "http://localhost:3001/api/v1/user/signup";
+
+      const payload = isSignin
+        ? { email, password }
+        : { email, password, name };
+
+      const response = await axios.post(Endpoint, payload);
+      if (isSignin) {
+        localStorage.setItem("token", response.data.token);
+      }
+      console.log(response);
+      setSuccess(response.data.message || "success");
+      router.push("/canvas/1");
+    } catch (err: unknown) {
+      console.error(err);
+
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Request failed");
+      } else {
+        setError("An unexpected error occurred");
+      }
+    }
+  };
   return (
     <Paper
       elevation={6}
@@ -20,7 +67,13 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
 
       <Stack spacing={3}>
         {!isSignin && (
-          <TextField label="Username" variant="outlined" fullWidth required />
+          <TextField
+            label="Username"
+            variant="outlined"
+            fullWidth
+            required
+            onChange={(e) => setName(e.target.value)}
+          />
         )}
 
         <TextField
@@ -29,6 +82,9 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
           variant="outlined"
           fullWidth
           required
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
         />
 
         <TextField
@@ -37,6 +93,9 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
           variant="outlined"
           fullWidth
           required
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
         />
 
         <Button
@@ -45,9 +104,12 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
           fullWidth
           size="large"
           sx={{ textTransform: "none", fontWeight: 600 }}
+          onClick={handleAuth}
         >
           {isSignin ? "Sign In" : "Sign Up"}
         </Button>
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
       </Stack>
 
       <Typography variant="body2" textAlign="center" mt={3}>
