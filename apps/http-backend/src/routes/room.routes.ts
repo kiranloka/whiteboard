@@ -1,5 +1,5 @@
 const { CreateRoomSchema } = require("@repo/common/types");
-const { prisma } = require("@repo/db/prisma");
+const { prisma } = require("@repo/db");
 import { Router as ExpressRouter } from "express";
 
 const router: ExpressRouter = ExpressRouter();

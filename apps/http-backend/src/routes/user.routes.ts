@@ -1,33 +1,38 @@
-const { CreateUserSchema, SigninSchema } = require("@repo/common/types");
+const { SigninSchema, CreateUserSchema } = require("@repo/common/types");
 import { Router as ExpressRouter } from "express";
-const { prisma } = require("@repo/db/prisma");
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { z } from "zod";
+import { prisma } from "@repo/db";
 
 const JWT_SECRET = require("@repo/config/config").JWT_SECRET;
 
 const router: ExpressRouter = ExpressRouter();
+
+const userSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(3).max(20),
+  name: z.string().min(3).max(20),
+});
 
 router.post("/signup", async (req, res) => {
   const { error, data } = CreateUserSchema.safeParse(req.body);
   if (error) {
     console.log(error.flatten());
     res.status(400).json({
-      message: "Validation error",
+      message: "Validation Error",
     });
     return;
   }
-
   try {
     const existingUser = await prisma.user.findFirst({
       where: {
         email: data.email,
       },
     });
-
     if (existingUser) {
       res.status(400).json({
-        message: "User already exists",
+        message: "user already exists",
       });
       return;
     }
@@ -43,14 +48,13 @@ router.post("/signup", async (req, res) => {
     res.status(201).json({
       userId: user.id,
     });
-  } catch (error) {
-    console.log(error);
+  } catch (e) {
+    console.log("Error:", e);
     res.status(500).json({
+      error: `${e}`,
       message: "Internal server error",
     });
   }
-
-  // res.send("User signed up");
 });
 
 router.post("/signin", async (req, res) => {
@@ -87,7 +91,7 @@ router.post("/signin", async (req, res) => {
     {
       userId: isUser.id,
     },
-    JWT_SECRET,
+    JWT_SECRET
   );
 
   res.status(200).json({

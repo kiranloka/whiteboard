@@ -32,18 +32,13 @@ export function Canvas({
   }, [canvasRef]);
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        overflow: "hidden",
-      }}
-    >
+    <div className="min-h-screen flex flex-col items-center">
+      <Topbar setSelectedTool={setSelectedTool} selectedTool={selectedTool} />
       <canvas
         ref={canvasRef}
         width={window.innerWidth}
         height={window.innerHeight}
       ></canvas>
-      <Topbar setSelectedTool={setSelectedTool} selectedTool={selectedTool} />
     </div>
   );
 }

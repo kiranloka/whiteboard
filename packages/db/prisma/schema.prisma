@@ -26,6 +26,7 @@ model Chat {
   roomId  Int
   room    Room   @relation(fields: [roomId], references: [id])
   user    User   @relation(fields: [userId], references: [id])
+
   @@map("chats")
 }
 
@@ -36,5 +37,6 @@ model Room {
   adminId   String
   chats     Chat[]
   admin     User     @relation(fields: [adminId], references: [id])
+
   @@map("rooms")
 }
