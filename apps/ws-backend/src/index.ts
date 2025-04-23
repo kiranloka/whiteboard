@@ -85,14 +85,19 @@ wss.on("connection", function connection(ws, request) {
       const roomId = Number(parsedData.roomId);
       const message = parsedData.message;
 
-      await prisma.chat.create({
+      const createdChat = await prisma.chat.create({
         data: {
           roomId,
           message,
           userId,
         },
       });
-
+      console.log("successfully added to prisma", {
+        id: createdChat.id,
+        roomId,
+        message,
+        userId,
+      });
       users.forEach((user) => {
         if (user.rooms.includes(roomId)) {
           user.ws.send(

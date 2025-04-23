@@ -1,26 +1,5 @@
 import { getExistingShapes } from "./http";
-import { Tool } from "@/lib/types";
-export type Shape =
-  | {
-      type: "rect";
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    }
-  | {
-      type: "circle";
-      centerX: number;
-      centerY: number;
-      radius: number;
-    }
-  | {
-      type: "pencil";
-      startX: number;
-      startY: number;
-      endX: number;
-      endY: number;
-    };
+import { Tool, Shape } from "@/lib/types";
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -30,6 +9,15 @@ export class Game {
   private clicked: boolean;
   private startX = 0;
   private startY = 0;
+  private lineWidth: number;
+  private currentPath: { x: number; y: number }[];
+
+  private zoomScale: number;
+  private selectedShapeIndex: number | null;
+  private isDragging: boolean;
+
+  private deleteShapeIndex: number | null;
+  private shapesToBeDeleted: Shape[];
   private selectedTool: Tool = "circle";
 
   socket: WebSocket;
@@ -41,6 +29,13 @@ export class Game {
     this.roomId = roomId;
     this.selectedTool = "rectangle";
     this.socket = socket;
+    this.lineWidth = 1;
+    this.currentPath = [];
+    this.zoomScale = 1;
+    this.selectedShapeIndex = null;
+    this.isDragging = false;
+    this.deleteShapeIndex = null;
+    this.shapesToBeDeleted = [];
     this.clicked = false;
     this.init();
     this.initHandlers();
@@ -76,6 +71,81 @@ export class Game {
       }
     };
   }
+  distanceToLine(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    px: number,
+    py: number
+  ): number {
+    const numerator = (y2 - y1) * px + (x2 - x1) * py + x2 * y1 - y2 * x1;
+    const denominator = Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+    return numerator / denominator;
+  }
+  isShapeClicked(shape: Shape, mouseX: number, mouseY: number): boolean {
+    switch (shape.type) {
+      case "rectangle":
+        return (
+          mouseX >= shape.startX &&
+          mouseX <= shape.endX &&
+          mouseY >= shape.startY &&
+          mouseY <= shape.endY
+        );
+      case "circle":
+        const radius =
+          Math.pow(shape.endX - shape.startX, 2) +
+          Math.pow(shape.endY - shape.startY, 2);
+        const distance =
+          Math.pow(mouseX - shape.startX, 2) +
+          Math.pow(mouseY - shape.startY, 2);
+        return distance <= radius;
+      case "line":
+        const distanceToLine = this.distanceToLine(
+          shape.startX,
+          shape.startY,
+          shape.endX,
+          shape.endY,
+          mouseX,
+          mouseY
+        );
+        return distanceToLine <= shape.lineWidth;
+
+      case "text":
+        const textWidth = this.ctx.measureText(shape.value!).width;
+        const textHeight = 20;
+        return (
+          mouseX >= shape.startX &&
+          mouseX <= shape.startX + textWidth &&
+          mouseY >= shape.startY - textHeight &&
+          mouseY <= shape.startY
+        );
+
+      default:
+        return false;
+    }
+  }
+  startDrawing(e: MouseEvent) {
+    const { offSetX, offSetY } = e;
+
+    if (this.selectedTool === "delete") {
+      for (let i = this.existingShapes.length - 1; i >= 0; i++) {
+        if (this.isShapeClicked(this.existingShapes[i], offSetX, offSetY)) {
+          this.deleteShapeIndex = i;
+          break;
+        }
+      }
+      if (this.deleteShapeIndex !== null && this.deleteShapeIndex >= 0) {
+        this.socket.send(
+          JSON.stringify({
+            type: "delete_shape",
+            deleteIndex: this.deleteShapeIndex,
+            roomId: this.roomId,
+          })
+        );
+      }
+    }
+  }
 
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -94,7 +164,7 @@ export class Game {
           shape.centerY,
           Math.abs(shape.radius),
           0,
-          Math.PI * 2,
+          Math.PI * 2
         );
         this.ctx.stroke();
         this.ctx.closePath();
@@ -138,15 +208,16 @@ export class Game {
 
     this.existingShapes.push(shape);
 
-    this.socket.send(
+    const frontendMessage = this.socket.send(
       JSON.stringify({
         type: "chat",
         message: JSON.stringify({
           shape,
         }),
         roomId: this.roomId,
-      }),
+      })
     );
+    console.log(frontendMessage);
   };
   mouseMoveHandler = (e: MouseEvent) => {
     if (this.clicked) {
