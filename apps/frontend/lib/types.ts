@@ -20,6 +20,7 @@ export type Shape = {
   startY: number;
   endX: number;
   endY: number;
+  color: string;
 
   lineWidth: number;
   value?: string;
