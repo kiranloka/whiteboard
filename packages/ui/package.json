@@ -21,7 +21,10 @@
     "typescript": "5.8.2"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.0",
+    "class-variance-authority": "^0.7.1",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-slot": "link:@types/radix-ui/react-slot"
   }
 }

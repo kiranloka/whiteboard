@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { IconButton } from "./IconButton";
+
 import { Game } from "@/draw/Game";
-import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
-import { initDraw } from "@/draw";
+
+import { ToolBar } from "./ToolBar";
 export type Tool = "circle" | "rectangle" | "pencil";
 
 export function Canvas({
@@ -14,11 +14,8 @@ export function Canvas({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Game>();
-  const [selectedTool, setSelectedTool] = useState<Tool>("circle");
 
-  useEffect(() => {
-    game?.setSelectedTool(selectedTool);
-  }, [selectedTool, game]);
+  useEffect(() => {}, [game]);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -33,54 +30,12 @@ export function Canvas({
 
   return (
     <div className="min-h-screen flex flex-col items-center">
-      <Topbar setSelectedTool={setSelectedTool} selectedTool={selectedTool} />
+      <ToolBar></ToolBar>
       <canvas
         ref={canvasRef}
         width={window.innerWidth}
         height={window.innerHeight}
       ></canvas>
-    </div>
-  );
-}
-
-function Topbar({
-  selectedTool,
-  setSelectedTool,
-}: {
-  selectedTool: Tool;
-  setSelectedTool: (tool: Tool) => void;
-}) {
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 10,
-        left: 10,
-      }}
-    >
-      <div className="flex gap-t">
-        <IconButton
-          onClick={() => {
-            setSelectedTool("pencil");
-          }}
-          activated={selectedTool === "pencil"}
-          icon={<Pencil />}
-        />
-        <IconButton
-          onClick={() => {
-            setSelectedTool("rectangle");
-          }}
-          activated={selectedTool === "rectangle"}
-          icon={<RectangleHorizontalIcon />}
-        ></IconButton>
-        <IconButton
-          onClick={() => {
-            setSelectedTool("circle");
-          }}
-          activated={selectedTool === "circle"}
-          icon={<Circle />}
-        ></IconButton>
-      </div>
     </div>
   );
 }
