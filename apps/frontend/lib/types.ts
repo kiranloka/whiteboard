@@ -10,7 +10,18 @@ export type Tool =
   | "delete"
   | "select";
 
-export type lineWidth = 1 | 2 | 4 | 5 | 10;
+export const lineWidth = [2, 4, 6, 8, 10] as const;
+
+export const COLORS = [
+  "#EF4444",
+  "#3B82F6",
+  "#10B981",
+  "#F59E0B",
+  "#000000",
+] as const;
+
+export type LINE_WIDTH = (typeof lineWidth)[number];
+export type Colors = (typeof COLORS)[number];
 
 export type Shape = {
   id: string;

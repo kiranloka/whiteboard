@@ -1,7 +1,7 @@
 import { WebSocket, WebSocketServer } from "ws";
 import jwt, { JwtPayload } from "jsonwebtoken";
-const { JWT_SECRET } = require("@repo/config/config").JWT_SECRET;
-const PORT = require("@repo/config/config").PORT;
+import { PORT, JWT_SECRET } from "@repo/config/config";
+
 const wss = new WebSocketServer({ port: PORT | 8080 });
 console.log(`Websocket server started at port ${PORT}`);
 

@@ -191,6 +191,9 @@ importers:
         specifier: ^8.18.1
         version: 8.18.1
     devDependencies:
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
