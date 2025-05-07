@@ -460,23 +460,22 @@ export class Game {
 
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    // this.ctx.fillStyle = "#000000";
-    // this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // console.log(this.existingShapes);
 
     this.existingShapes.forEach((shape) => {
+      this.ctx.strokeStyle = shape.color;
+      this.ctx.lineWidth = shape.lineWidth;
+
       switch (shape.type) {
         case "rectangle":
-          const width = shape.endX - shape.startX;
-          const height = shape.endY - shape.startY;
-
-          this.ctx.strokeStyle = shape.color;
-          this.ctx.lineWidth = shape.lineWidth;
-          this.ctx.strokeRect(shape.startX, shape.startY, width, height);
+          this.ctx.strokeRect(
+            shape.startX,
+            shape.startY,
+            shape.endX - shape.startX,
+            shape.endY - shape.startY
+          );
           break;
+
         case "circle":
-          this.ctx.strokeStyle = shape.color;
           const radius = Math.sqrt(
             Math.pow(shape.endX - shape.startX, 2) +
               Math.pow(shape.endY - shape.startY, 2)
@@ -486,13 +485,15 @@ export class Game {
           this.ctx.stroke();
           this.ctx.closePath();
           break;
+
         case "line":
-          this.ctx.strokeStyle = shape.color;
-          this.ctx.lineWidth = shape.lineWidth;
           this.ctx.beginPath();
           this.ctx.moveTo(shape.startX, shape.startY);
           this.ctx.lineTo(shape.endX, shape.endY);
           this.ctx.stroke();
+          this.ctx.closePath();
+
+          // Optional: draw arrowhead
           this.drawArrowhead(
             this.ctx,
             shape.startX,
@@ -501,30 +502,23 @@ export class Game {
             shape.endY
           );
           break;
+
         case "text":
-          if (!shape.value) {
-            return;
-          }
-          this.ctx.font = "20px Arial";
+          this.ctx.font = `${shape.lineWidth * 5}px Arial`; // scalable font size
           this.ctx.fillStyle = shape.color;
-          this.ctx.lineWidth = shape.lineWidth;
-          this.ctx.fillText(shape.value, shape.startX, shape.startY);
+          this.ctx.fillText(shape.value ?? "", shape.startX, shape.startY);
           break;
+
         case "pencil":
-          if (shape.points?.length === undefined || shape.points?.length < 2)
-            return;
-          // console.log("painting...");
-
-          this.ctx.strokeStyle = shape.color;
-          this.ctx.lineWidth = shape.lineWidth;
+          if (!shape.points || shape.points.length < 2) return;
           this.ctx.beginPath();
-
           this.ctx.moveTo(shape.points[0].x, shape.points[0].y);
           for (let i = 1; i < shape.points.length; i++) {
             this.ctx.lineTo(shape.points[i].x, shape.points[i].y);
           }
-
           this.ctx.stroke();
+          this.ctx.closePath();
+          break;
       }
     });
   }
