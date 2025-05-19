@@ -73,10 +73,15 @@ export class Game {
   }
 
   private async initExistingShapes() {
-    this.existingShapes = await getCanvasShapes(this.roomId);
-    console.log(this.existingShapes);
-
-    this.clearCanvas();
+    try {
+      const shapes = await getCanvasShapes(this.roomId);
+      if (shapes && shapes.length > 0) {
+        this.existingShapes = shapes;
+        this.clearCanvas(); // Now this will redraw all shapes
+      }
+    } catch (error) {
+      console.error("Error fetching shapes:", error);
+    }
   }
 
   private initZoomHandlers() {
@@ -360,7 +365,7 @@ export class Game {
       this.isDragging &&
       this.selectedShapeIndex !== null
     ) {
-      const shape = this.existingShapes[this.selectedShapeIndex]; //memory ref
+      const shape = this.existingShapes[this.selectedShapeIndex];
 
       const deltaX = e.movementX;
       const deltaY = e.movementY;
@@ -373,6 +378,7 @@ export class Game {
         shape.endY += deltaY;
       }
 
+      // Send movement update to server
       this.socket.send(
         JSON.stringify({
           type: "move_shape",
@@ -382,7 +388,7 @@ export class Game {
         })
       );
 
-      // this.clearCanvas();
+      this.clearCanvas(); // Clear and redraw to show movement in real-time
       return;
     }
 
@@ -702,8 +708,6 @@ export class Game {
 
       if (message.type === "chat") {
         const parsedShape = JSON.parse(message.message);
-        // console.log(JSON.stringify(parsedShape));
-
         const isDuplicate = this.existingShapes.some(
           (existingShape) =>
             JSON.stringify(existingShape) === JSON.stringify(parsedShape.shape)
@@ -715,30 +719,25 @@ export class Game {
 
       if (message.type === "move_shape") {
         const { shape, shapeIndex } = message;
-
         if (this.existingShapes[shapeIndex]) {
-          this.existingShapes[shapeIndex] = shape;
+          this.existingShapes[shapeIndex] = { ...shape }; // Create a new reference
+          this.clearCanvas(); // Redraw immediately
         }
-        this.clearCanvas();
       }
 
       if (message.type === "delete_shape") {
         const { deleteIndex } = message;
-
         this.existingShapes = this.existingShapes.filter(
           (_, index) => index !== deleteIndex
         );
-
         this.clearCanvas();
       }
 
       if (message.type === "delete_shape_by_id") {
         const { shapeId } = message;
-
         this.existingShapes = this.existingShapes.filter(
           (shape) => shape.id !== shapeId
         );
-
         this.clearCanvas();
       }
     };
