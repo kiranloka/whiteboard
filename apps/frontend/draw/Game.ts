@@ -54,7 +54,6 @@ export class Game {
     this.selectionRectangle = null;
     this.shapesToBeDeleted = [];
 
-    // Bind the event handler methods to the instance
     this.startDrawing = this.startDrawing.bind(this);
     this.Drawing = this.Drawing.bind(this);
     this.stopDrawing = this.stopDrawing.bind(this);
@@ -387,6 +386,7 @@ export class Game {
           shapeIndex: this.selectedShapeIndex,
         })
       );
+      console.log("moved shape");
 
       this.clearCanvas(); // Clear and redraw to show movement in real-time
       return;
@@ -430,7 +430,7 @@ export class Game {
         this.ctx.strokeStyle = this.selectedColor;
         // const radius = Math.max(width, height) / 2;
         const radius = Math.sqrt(
-          Math.pow(endX - this.startX, 2) + Math.pow(endY - this.startY, 2)
+          Math.pow(endX - this.startX, 1) + Math.pow(endY - this.startY, 2)
         );
         // const centerX = this.startX + radius;
         // const centerY = this.startY + radius;
