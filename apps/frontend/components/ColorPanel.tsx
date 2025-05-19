@@ -13,9 +13,9 @@ export const ColorPanel: React.FC<colorPanelProps> = ({
   setLineWidths,
 }) => {
   return (
-    <div className=" bg-background rounded-md w-fit pb-4">
+    <div className="bg-gray-900 rounded-md w-fit pb-4 px-4">
       <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Colors</h3>
+        <h3 className="text-sm font-medium text-gray-200 mb-2">Colors</h3>
         <div className="flex gap-2">
           {COLORS.map((color) => (
             <button
@@ -23,29 +23,29 @@ export const ColorPanel: React.FC<colorPanelProps> = ({
               onClick={() => setSelectedColor(color)}
               className={`w-8 h-8 rounded-full border-2 transition duration-200 ${
                 selectedColor === color
-                  ? "ring-2 ring-offset-2 ring-gray-400"
-                  : "border-gray-300"
+                  ? "ring-2 ring-offset-2 ring-indigo-400"
+                  : "border-gray-600"
               }`}
               style={{ backgroundColor: color }}
             />
           ))}
         </div>
       </div>
-      <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Line Width</h3>
+      <div className="mt-4">
+        <h3 className="text-sm font-medium text-gray-200 mb-2">Line Width</h3>
         <div className="flex gap-2">
           {lineWidth.map((width) => (
             <button
               key={width}
               onClick={() => setLineWidths(width)}
-              className={`w-8 h-8 rounded-full border flex items-center justify-center ${
+              className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors duration-200 ${
                 lineWidths === width
-                  ? "bg-gray-200 border-gray-600"
-                  : "border-gray-300"
+                  ? "bg-indigo-600 border-indigo-500"
+                  : "border-gray-600"
               }`}
             >
               <div
-                className="rounded-full bg-black"
+                className="rounded-full bg-white"
                 style={{ width: `${width}px`, height: `${width}px` }}
               />
             </button>
