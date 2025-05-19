@@ -14,6 +14,7 @@ import {
 import { Colors, LINE_WIDTH, Tool } from "@/lib/types";
 import { ColorPanel } from "./ColorPanel";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface ToolBarProps {
   color: Colors;
@@ -21,6 +22,7 @@ interface ToolBarProps {
   lineWidth: LINE_WIDTH;
   setLineWidth: (width: LINE_WIDTH) => void;
 }
+
 const tools: { tool: Tool; icon: JSX.Element }[] = [
   { tool: "circle", icon: <Circle size={16} /> },
   { tool: "move", icon: <Move size={16} /> },
@@ -42,10 +44,10 @@ export const ToolBar: React.FC<ToolBarProps> = ({
 
   return (
     <div
-      className="flex bg-gray-700 text-white shadow-[0_0_12px_rgba(59,130,246,0.3)]
-        border-2 border-amber-500 mt-4 fixed rounded-2xl p-2 gap-2"
+      className="flex items-start gap-4 bg-gray-700 text-white shadow-[0_0_12px_rgba(59,130,246,0.3)]
+        border-2 border-amber-500 mt-4 fixed rounded-2xl p-3 left-4 top-4 z-50"
     >
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {tools.map(({ tool, icon }) => (
           <Button
             key={tool}
@@ -71,16 +73,24 @@ export const ToolBar: React.FC<ToolBarProps> = ({
         </Button>
       </div>
 
-      {showColorPanel && (
-        <div className="ml-4">
-          <ColorPanel
-            selectedColor={color}
-            setSelectedColor={setColor}
-            lineWidths={lineWidth}
-            setLineWidths={setLineWidth}
-          />
-        </div>
-      )}
+      <AnimatePresence>
+        {showColorPanel && (
+          <motion.div
+            className="origin-top-left"
+            initial={{ opacity: 0, scale: 0.9, x: -10 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.9, x: -10 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+          >
+            <ColorPanel
+              selectedColor={color}
+              setSelectedColor={setColor}
+              lineWidths={lineWidth}
+              setLineWidths={setLineWidth}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
