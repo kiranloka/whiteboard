@@ -13,7 +13,7 @@ export const ColorPanel: React.FC<colorPanelProps> = ({
   setLineWidths,
 }) => {
   return (
-    <div className=" bg-white rounded-md w-fit pb-4">
+    <div className=" bg-background rounded-md w-fit pb-4">
       <div>
         <h3 className="text-sm font-medium text-gray-700 mb-2">Colors</h3>
         <div className="flex gap-2">
