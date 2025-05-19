@@ -158,9 +158,9 @@ export class Game {
     input.value = (clickedShape ? clickedShape.value : "") as string;
     input.style.position = "absolute";
     input.style.left = `${clickedShape ? clickedShape.startX : x}px`;
-
     input.style.top = `${clickedShape ? clickedShape.startY : y - 10}px`;
-    input.style.font = "20px Arial";
+    input.style.fontFamily = "Virgil";
+    input.style.fontSize = "30px";
     input.style.background = "transparent";
     input.style.color = `${clickedShape ? clickedShape.color : this.selectedColor}`;
     input.style.border = "none";
@@ -206,7 +206,7 @@ export class Game {
   }
 
   renderText(text: string, x: number, y: number) {
-    this.ctx.font = "20px Arial";
+    this.ctx.font = "30px Virgil";
     this.ctx.fillStyle = this.selectedColor;
     this.ctx.fillText(text, x, y);
 
@@ -225,7 +225,7 @@ export class Game {
       color: this.selectedColor,
       endX: 0,
       endY: 0,
-      lineWidth: this.lineWidth,
+      lineWidth: 3,
       value: text,
     };
     this.existingShapes.push(shape);
@@ -510,7 +510,7 @@ export class Game {
           break;
 
         case "text":
-          this.ctx.font = `${shape.lineWidth * 5}px Arial`; // scalable font size
+          this.ctx.font = "30px Virgil";
           this.ctx.fillStyle = shape.color;
           this.ctx.fillText(shape.value ?? "", shape.startX, shape.startY);
           break;

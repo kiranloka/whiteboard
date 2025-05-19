@@ -13,11 +13,11 @@ export type Tool =
 export const lineWidth = [2, 4, 6, 8, 10] as const;
 
 export const COLORS = [
-  "#EF4444",
-  "#3B82F6",
-  "#10B981",
-  "#F59E0B",
-  "#000000",
+  "#FFFFFF",
+  "#60A5FA",
+  "#34D399",
+  "#FBBF24",
+  "#F87171",
 ] as const;
 
 export type LINE_WIDTH = (typeof lineWidth)[number];

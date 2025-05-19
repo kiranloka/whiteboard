@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Gloria_Hallelujah } from "next/font/google";
 import "./globals.css";
 import { ThemeRegistry } from "@/components/ThemeRegistry";
+// If using Next.js (App Router)
+import Head from "next/head";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
-
+const geistGloria = Gloria_Hallelujah({
+  weight: "400",
+  variable: "--font-geist-gloria-hallelujah",
+  subsets: ["latin"],
+});
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
