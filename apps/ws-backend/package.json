@@ -12,11 +12,12 @@
     "@types/jsonwebtoken": "^9.0.9",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "redis": "^5.0.1",
     "ws": "^8.18.1"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
     "@repo/config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/express": "^5.0.1",
     "@types/ws": "^8.18.1",
     "tsx": "^4.19.3"

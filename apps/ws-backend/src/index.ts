@@ -1,15 +1,22 @@
 import { WebSocket, WebSocketServer } from "ws";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { PORT, JWT_SECRET } from "@repo/config/config";
-
+import { createClient } from "redis";
 const wss = new WebSocketServer({ port: PORT | 8080 });
 console.log(`Websocket server started at port ${PORT}`);
-
+initRedis();
 import { prisma } from "@repo/db";
 interface User {
   ws: WebSocket;
   rooms: number[];
   userId: string;
+}
+const redis = createClient();
+async function initRedis() {
+  const connect = await redis.connect();
+  if (connect) {
+    console.log("Redis connected");
+  }
 }
 
 const users: User[] = [];
@@ -84,6 +91,13 @@ wss.on("connection", function connection(ws, request) {
     if (parsedData.type === "chat") {
       const roomId = Number(parsedData.roomId);
       const message = parsedData.message;
+
+      await redis.xAdd("chat_messages", "*", {
+        roomId: roomId.toString(),
+        message,
+        userId,
+      });
+      console.log("chat pushed to Redis");
 
       const createdChat = await prisma.chat.create({
         data: {

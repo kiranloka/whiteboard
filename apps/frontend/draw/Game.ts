@@ -313,23 +313,17 @@ export class Game {
       }
 
       if (this.deleteShapeIndex !== null && this.deleteShapeIndex >= 0) {
-        // this.existingShapes = this.existingShapes.filter(
-        //   (_, index) => index !== this.deleteShapeIndex
-        // );
-
-        // this.existingShapes.splice(this.deleteShapeIndex, 1);
+        const shapeToDelete = this.existingShapes[this.deleteShapeIndex];
         this.socket.send(
           JSON.stringify({
-            type: "delete_shape",
-            deleteIndex: this.deleteShapeIndex,
+            type: "delete_shape_by_id",
+            shapeId: shapeToDelete.id,
             roomId: this.roomId,
           })
         );
         this.deleteShapeIndex = null;
+        this.clearCanvas();
       }
-
-      // this.clearCanvas();
-
       return;
     }
 
@@ -720,17 +714,9 @@ export class Game {
       if (message.type === "move_shape") {
         const { shape, shapeIndex } = message;
         if (this.existingShapes[shapeIndex]) {
-          this.existingShapes[shapeIndex] = { ...shape }; // Create a new reference
-          this.clearCanvas(); // Redraw immediately
+          this.existingShapes[shapeIndex] = { ...shape };
+          this.clearCanvas();
         }
-      }
-
-      if (message.type === "delete_shape") {
-        const { deleteIndex } = message;
-        this.existingShapes = this.existingShapes.filter(
-          (_, index) => index !== deleteIndex
-        );
-        this.clearCanvas();
       }
 
       if (message.type === "delete_shape_by_id") {

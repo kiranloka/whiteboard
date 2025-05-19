@@ -49,7 +49,7 @@ export const ToolBar: React.FC<ToolBarProps> = ({
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
       <div
         className="relative flex items-center gap-2 bg-gray-700 text-white 
-        shadow-[0_0_12px_rgba(59,130,246,0.3)] border-2 border-amber-500 
+        shadow-[0_0_12px_rgba(59,130,246,0.3)] border-1 border-amber-300 
         rounded-2xl px-4 py-2"
       >
         {/* Tool Buttons */}
