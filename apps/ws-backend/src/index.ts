@@ -2,21 +2,28 @@ import { WebSocket, WebSocketServer } from "ws";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { PORT, JWT_SECRET } from "@repo/config/config";
 import { createClient } from "redis";
-const wss = new WebSocketServer({ port: PORT | 8080 });
-console.log(`Websocket server started at port ${PORT}`);
-initRedis();
 import { prisma } from "@repo/db";
+
+const redis = createClient();
+const wss = new WebSocketServer({ port: PORT | 8080 });
+
+console.log(`Websocket server started at port ${PORT}`);
+
+async function initRedis() {
+  try {
+    await redis.connect();
+    console.log("Redis connected");
+  } catch (error) {
+    console.error("Failed to connect to Redis:", error);
+  }
+}
+
+initRedis();
+
 interface User {
   ws: WebSocket;
   rooms: number[];
   userId: string;
-}
-const redis = createClient();
-async function initRedis() {
-  const connect = await redis.connect();
-  if (connect) {
-    console.log("Redis connected");
-  }
 }
 
 const users: User[] = [];

@@ -15,9 +15,10 @@ import constants from "@/lib/constants";
 import Image from "next/image";
 import { HeroCanvas } from "@/components/HeroCanvas";
 import { inView, motion, useInView } from "framer-motion";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronRight, Shapes } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import FaqSection from "@/components/FaqSection";
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
   const ref = useRef(null);
@@ -265,7 +266,7 @@ export default function Home() {
 
         <section
           ref={ref}
-          className="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center justify-between px-2 md:px-12 py-40"
+          className="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center justify-between px-20 md:px-12 py-40"
         >
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -283,7 +284,9 @@ export default function Home() {
               Your ideas need space to breathe
             </span>
             <br />
-            <Button className="mt-10">Get Started</Button>
+            <button className="px-8 py-2 rounded-full bg-gradient-to-b from-rose-300 to-rose-500 mt-4 text-gray-50 focus:ring-2 focus:ring-blue-400 hover:shadow-xl transition duration-200">
+              Get Started
+            </button>
           </motion.div>
 
           <motion.div
@@ -295,15 +298,56 @@ export default function Home() {
             <HeroCanvas isLoaded={isLoaded} />
           </motion.div>
         </section>
+
+        <section className="pt-20 pb-20 px-4 bg-gray-100">
+          <div className="max-w-md mx-auto text-center">
+            <h3 className="text-4xl font-semibold mb-2">Join our Newsletter</h3>
+            <p className="text-gray-500 mb-4">
+              Stay updated with our latest news and updates.
+            </p>
+            <div className="flex items-center gap-2">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1"
+              />
+            </div>
+          </div>
+        </section>
         <section className="mt-0 pb-10 mb-5">
           <FaqSection />
         </section>
       </div>
-      <footer className="bg-background py-2">
+      <footer className="bg-gray-800 text-white py-8">
         <div className="container mx-auto px-4">
-          <p className="text-center text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} WhiteBoard. All rights reserved.
-          </p>
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <Shapes className="h-6 w-6 text-rose-500" />
+              <span className="text-xl font-bold ">Whiteboard</span>
+            </div>
+            <div className="flex flex-col space-y-2">
+              <a href="#" className="hover:text-gray-300">
+                Home
+              </a>
+              <a href="#" className="hover:text-gray-300">
+                About
+              </a>
+              <a href="#" className="hover:text-gray-300">
+                Contact
+              </a>
+              <a href="#" className="hover:text-gray-300">
+                Terms
+              </a>
+              <a href="#" className="hover:text-gray-300">
+                Privacy?
+              </a>
+            </div>
+          </div>
+          <div className="mt-8 border-t border-gray-800 pt-4">
+            <p className="text-center text-sm text-gray-400">
+              &copy; {new Date().getFullYear()} WhiteBoard. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
     </>

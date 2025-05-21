@@ -1,81 +1,139 @@
+"use client";
 
-"use client"
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Pencil,
+  Square,
+  Circle,
+  Type,
+  ImageIcon,
+  Eraser,
+  Sparkles,
+} from "lucide-react";
 
-import { useEffect, useState } from "react"
-import { motion, useAnimation } from "framer-motion"
-import { Pencil, Square, Circle, Type, ImageIcon, Eraser } from "lucide-react"
+type Doodle = {
+  type: string;
+  x: number;
+  y: number;
+  size?: number;
+  color: string;
+  rotation?: number;
+  text?: string;
+  delay: number;
+  id: string;
+};
 
-interface HeroCanvasProps {
-  isLoaded: boolean
-}
+export function HeroCanvas({ isLoaded }: { isLoaded: boolean }) {
+  const [doodles, setDoodles] = useState<Doodle[]>([]);
+  const [activeTool, setActiveTool] = useState("pencil");
+  const [cursorPosition, setCursorPosition] = useState({ x: 50, y: 50 });
 
-interface Doodle {
-  type: string
-  x: number
-  y: number
-  size?: number
-  color: string
-  rotation?: number
-  text?: string
-  delay: number
-}
-
-export function HeroCanvas({ isLoaded }: HeroCanvasProps) {
-  const controls = useAnimation()
-  const [doodles, setDoodles] = useState<Doodle[]>([])
-  const [activeTool, setActiveTool] = useState("pencil")
-  const [cursorPosition, setCursorPosition] = useState({ x: 50, y: 50 })
-
-  // Generate random doodles
+  // Generate random doodles with infinite loop
   useEffect(() => {
-    if (isLoaded) {
-      const newDoodles: Doodle[] = [
-        { type: "square", x: 20, y: 30, size: 60, color: "#7c3aed", rotation: 15, delay: 0.5 },
-        { type: "circle", x: 70, y: 60, size: 40, color: "#ec4899", delay: 0.7 },
-        { type: "text", x: 30, y: 70, color: "#0ea5e9", text: "Hello!", delay: 0.9 },
-        { type: "square", x: 65, y: 25, size: 30, color: "#f59e0b", rotation: -10, delay: 1.1 },
-        { type: "circle", x: 25, y: 50, size: 25, color: "#10b981", delay: 1.3 },
-        { type: "text", x: 60, y: 40, color: "#ef4444", text: "Draw!", delay: 1.5 },
-      ]
+    if (!isLoaded) return;
 
-      setDoodles(newDoodles)
-      controls.start({ opacity: 1 })
+    const generateDoodle = (id: string): Doodle => {
+      const types = ["square", "circle", "text"];
+      const type = types[Math.floor(Math.random() * types.length)];
+      const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+      const x = 10 + Math.random() * 80;
+      const y = 10 + Math.random() * 80;
+      const delay = 0.2 + Math.random() * 1.3;
+      const size = 20 + Math.random() * 60;
+      const rotation = Math.random() * 30 - 15;
+      const text =
+        type === "text"
+          ? ["Hello!", "Draw!", "Create!", "Doodle!"][
+              Math.floor(Math.random() * 4)
+            ]
+          : undefined;
 
-      // Animate cursor
-      const interval = setInterval(() => {
-        setCursorPosition({
-          x: 20 + Math.random() * 60,
-          y: 20 + Math.random() * 60,
-        })
-      }, 3000)
+      return { type, x, y, size, color, rotation, text, delay, id };
+    };
 
-      return () => clearInterval(interval)
-    }
-  }, [isLoaded, controls])
+    // Initial doodles
+    const initialDoodles = Array.from({ length: 8 }).map((_, i) =>
+      generateDoodle(`doodle-${i}`)
+    );
+    setDoodles(initialDoodles);
+
+    // Add new doodles at intervals
+    const interval = setInterval(() => {
+      const newId = `doodle-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      setDoodles((prev) => [...prev.slice(-14), generateDoodle(newId)]);
+    }, 2000);
+
+    // Animate cursor
+    const cursorInterval = setInterval(() => {
+      setCursorPosition({
+        x: 20 + Math.random() * 60,
+        y: 20 + Math.random() * 60,
+      });
+    }, 3000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(cursorInterval);
+    };
+  }, [isLoaded]);
+
+  // Toolbar buttons
+  const tools = [
+    { icon: <Pencil className="h-4 w-4" />, tool: "pencil" },
+    { icon: <Square className="h-4 w-4" />, tool: "square" },
+    { icon: <Circle className="h-4 w-4" />, tool: "circle" },
+    { icon: <Type className="h-4 w-4" />, tool: "text" },
+    { icon: <ImageIcon className="h-4 w-4" />, tool: "image" },
+    { icon: <Eraser className="h-4 w-4" />, tool: "eraser" },
+    { icon: <Sparkles className="h-4 w-4" />, tool: "sparkles" },
+  ];
 
   return (
-    <div className="relative w-full h-full bg-white rounded-lg overflow-hidden">
+    <div className="relative w-full h-full bg-white rounded-xl overflow-hidden group">
+      {/* Grid background */}
+      <svg width="100%" height="100%" className="absolute inset-0">
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path
+            d="M 20 0 L 0 0 0 20"
+            fill="none"
+            stroke="rgba(0,0,0,0.05)"
+            strokeWidth="0.5"
+          />
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+      </svg>
+
+      {/* Optional: Sparkles background effect (Aceternity-style) */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.2 }}
+        transition={{ duration: 1 }}
+        className="absolute inset-0 pointer-events-none"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-pink-100/20 to-blue-100/20"></div>
+      </motion.div>
+
       {/* Toolbar */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10 flex items-center gap-1 p-1 bg-background/90 backdrop-blur-sm rounded-lg border shadow-sm"
+        className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 flex items-center gap-1 p-2 bg-white/90 backdrop-blur-sm rounded-xl border border-gray-200 shadow-lg"
       >
-        {[
-          { icon: <Pencil className="h-4 w-4" />, tool: "pencil" },
-          { icon: <Square className="h-4 w-4" />, tool: "square" },
-          { icon: <Circle className="h-4 w-4" />, tool: "circle" },
-          { icon: <Type className="h-4 w-4" />, tool: "text" },
-          { icon: <ImageIcon className="h-4 w-4" />, tool: "image" },
-          { icon: <Eraser className="h-4 w-4" />, tool: "eraser" },
-        ].map((item, i) => (
+        {tools.map((item, i) => (
           <motion.button
             key={item.tool}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: 0.4 + i * 0.1 }}
-            className={`p-2 rounded-md ${activeTool === item.tool ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+            whileHover={{ scale: 1.1, backgroundColor: "#f3f4f6" }}
+            whileTap={{ scale: 0.95 }}
+            className={`p-2 rounded-lg ${
+              activeTool === item.tool
+                ? "bg-indigo-500 text-white"
+                : "hover:bg-gray-100"
+            }`}
             onClick={() => setActiveTool(item.tool)}
           >
             {item.icon}
@@ -84,21 +142,14 @@ export function HeroCanvas({ isLoaded }: HeroCanvasProps) {
       </motion.div>
 
       {/* Canvas content */}
-      <motion.div initial={{ opacity: 0 }} animate={controls} className="w-full h-full">
-        {/* Grid background */}
-        <svg width="100%" height="100%" className="absolute inset-0">
-          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="0.5" />
-          </pattern>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-
+      <div className="relative w-full h-full">
         {/* Doodles */}
-        {doodles.map((doodle, index) => (
+        {doodles.map((doodle) => (
           <motion.div
-            key={index}
+            key={doodle.id}
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
             transition={{
               type: "spring",
               stiffness: 260,
@@ -113,68 +164,99 @@ export function HeroCanvas({ isLoaded }: HeroCanvasProps) {
                 ? `translate(-50%, -50%) rotate(${doodle.rotation}deg)`
                 : "translate(-50%, -50%)",
               color: doodle.color,
+              zIndex: 10,
             }}
           >
             {doodle.type === "square" && (
-              <div
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.7 }}
+                transition={{ delay: doodle.delay + 0.2 }}
+                className="rounded-md"
                 style={{
                   width: doodle.size,
                   height: doodle.size,
                   backgroundColor: doodle.color,
-                  opacity: 0.7,
-                  borderRadius: "4px",
                 }}
               />
             )}
             {doodle.type === "circle" && (
-              <div
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.7 }}
+                transition={{ delay: doodle.delay + 0.2 }}
+                className="rounded-full"
                 style={{
                   width: doodle.size,
                   height: doodle.size,
                   backgroundColor: doodle.color,
-                  opacity: 0.7,
-                  borderRadius: "50%",
                 }}
               />
             )}
             {doodle.type === "text" && (
-              <div
-                style={{
-                  color: doodle.color,
-                  fontWeight: "bold",
-                  fontSize: "24px",
-                }}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: doodle.delay + 0.2 }}
+                className="font-bold text-2xl"
+                style={{ color: doodle.color }}
               >
                 {doodle.text}
-              </div>
+              </motion.div>
             )}
           </motion.div>
         ))}
 
         {/* Animated cursor */}
         <motion.div
-          initial={{ opacity: 0 }}
           animate={{
-            opacity: 1,
             x: `${cursorPosition.x}%`,
             y: `${cursorPosition.y}%`,
           }}
           transition={{
             x: { type: "spring", stiffness: 100, damping: 15 },
             y: { type: "spring", stiffness: 100, damping: 15 },
-            opacity: { duration: 0.3 },
           }}
           className="absolute w-6 h-6 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 4L20 20" stroke="black" strokeWidth="2" strokeLinecap="round" />
-            <path d="M20 4L4 20" stroke="black" strokeWidth="2" strokeLinecap="round" />
-            {activeTool === "pencil" && <circle cx="12" cy="12" r="8" fill="rgba(0,0,0,0.1)" />}
-            {activeTool === "square" && <rect x="6" y="6" width="12" height="12" fill="rgba(0,0,0,0.1)" />}
-            {activeTool === "circle" && <circle cx="12" cy="12" r="6" fill="rgba(0,0,0,0.1)" />}
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 4L20 20"
+              stroke="black"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M20 4L4 20"
+              stroke="black"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            {activeTool === "pencil" && (
+              <circle cx="12" cy="12" r="8" fill="rgba(0,0,0,0.1)" />
+            )}
+            {activeTool === "square" && (
+              <rect x="6" y="6" width="12" height="12" fill="rgba(0,0,0,0.1)" />
+            )}
+            {activeTool === "circle" && (
+              <circle cx="12" cy="12" r="6" fill="rgba(0,0,0,0.1)" />
+            )}
+            {activeTool === "sparkles" && (
+              <>
+                <circle cx="12" cy="12" r="4" fill="rgba(255,215,0,0.2)" />
+                <circle cx="12" cy="8" r="2" fill="rgba(255,215,0,0.2)" />
+                <circle cx="16" cy="12" r="2" fill="rgba(255,215,0,0.2)" />
+              </>
+            )}
           </svg>
         </motion.div>
-      </motion.div>
+      </div>
     </div>
-  )
+  );
 }

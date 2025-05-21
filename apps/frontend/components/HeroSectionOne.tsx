@@ -82,7 +82,7 @@ export function HeroSectionOne() {
         >
           <div className="w-full overflow-hidden rounded-xl border border-gray-900 dark:border-gray-700">
             <img
-              src="https://assets.aceternity.com/pro/aceternity-landing.webp" // Replace with your whiteboard preview image
+              src="image.png" // Replace with your whiteboard preview image
               alt="Whiteboard canvas preview"
               className="aspect-[16/9] h-auto w-full object-cover"
               height={1000}
